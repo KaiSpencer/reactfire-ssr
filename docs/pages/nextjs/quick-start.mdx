@@ -1,0 +1,168 @@
+# Firestore Quick Start
+
+The following quick start example builds upon the `burrito` example in the [reactfire quick start guide](https://github.com/FirebaseExtended/reactfire/blob/main/docs/quickstart.md).
+
+If you have not done so already, follow those instructions and we will pick up where it leaves off.
+
+## Concepts
+
+Before we start coding, let's review some concepts.
+
+The concept of how we will manage Server Side Rendering (SSR) is based (and heavily inspired ❤️) by the [tanstack query](https://tanstack.com/query/v4/docs/react/guides/ssr) model for SSR.
+
+### Hydration
+
+We will be `Hydrating` the `reactfire` data with pre fetched data which we `dehydrate` from the server.
+
+This simply means we will be using `getServerSideProps` to fetch the data on the server and pass it to `reactfire` as the initial data for queries.
+
+The outcome is that there is no initial loading state for the data on the client, with the data available immediately, to then be updated with `reactfire` as the data changes in firestore.
+
+### Key points to note
+
+- Be careful not to use `firestore` and `firebase-admin` in the wrong place
+	- `firestore` is for the client
+	- `firebase-admin` is for the server (getServerSideProps)
+
+
+## Hydrate component
+
+`reactfire-ssr` provides a `Hydrate` component which is responsible for passing through any `dehydrated` data to your nextjs pages.
+
+Add this component to your `_app.tsx` file.
+
+Ensure it is a child of the `FirestoreProvider` component from `reactfire`.
+
+```tsx showLineNumbers {12,14} filename="_app.tsx"
+import { Hydrate } from 'reactfire-ssr'
+import {getFirestore} from "firebase/firestore";
+import {
+  FirestoreProvider,
+  useFirebaseApp,
+} from "reactfire";
+
+ export default function MyApp({ Component, pageProps }) {
+   const sdk = getFirestore(useFirebaseApp());
+   return (
+     <FirestoreProvider sdk={sdk}>
+	   <Hydrate state={pageProps.dehydratedState}>
+	     <Component {...pageProps} />
+	   </Hydrate>
+     </FirestoreProvider>
+   )
+ }
+ ```
+
+## Pre fetching data
+
+Now we need to use `getServerSideProps` to pre-fetch the data from firestore.
+
+Because `getServerSideProps` runs on the server we need to use the `firebase-admin` sdk to access firestore __not__ `firebase`.
+
+Use the `dehydrate` function which is a helper to unwrap a list of `DocumentReference` and `CollectionReference` objects,
+pass this as props to the page to make it available to `reactfire-ssr` hooks in your components.
+
+```tsx showLineNumbers filename="pages/index.tsx" {19-22}
+import {getFirestore} from "firebase-admin";
+import {dehydrate} from "reactfire-ssr";
+/**
+* Ensure you have initialized firebase somewhere,
+* see the examples directory in the repository for an example
+*/
+const firestore = getFirestore()
+
+export async function getServerSideProps() {
+  const burritoDocRef = firestore
+    .doc("tryreactfire/burrito")
+	/*
+     * Using a converter is optional, but provides great type safety
+	 * see the examples directory in the repository for an example using zod
+	 */
+    .withConverter(burritoConverterAdmin); //
+  const tryreactfireCollectionRef = firestore.collection("tryreactfire");
+
+  const dehydrateData = await dehydrate(
+    [burritoDocRef],
+    [tryreactfireCollectionRef],
+  );
+  return {
+    props: dehydrateData,
+	/**
+	* Or pass other props alongside the dehydrated data
+	*/
+    // props: { ...dehydrateData, myOtherProp: "goesHere" }
+  };
+}
+```
+
+## Using Pre fetched data
+
+Now we can use the `useHydratedFirestoreDocData` and `useHydratedFirestoreCollectionData` hooks to access the pre-fetched data.
+
+There is nothing fancy to know about these hooks, they simply wrap `useFirestoreDocData` and `useFirestoreCollectionData` respectively.
+
+Under the hood these hooks will use the `dehydrated` data if it is available, otherwise it will fetch the data from firestore.
+
+If its available, your data will be available instantly on the client without a loading state.
+
+```tsx showLineNumbers filename="pages/index.tsx" {28-59}
+import {useHydratedFirestoreDocData, useHydratedFirestoreCollectionData} from "reactfire-ssr";
+
+const firestore = getFirestore()
+
+export async function getServerSideProps() {
+  const burritoDocRef = firestore
+    .doc("tryreactfire/burrito")
+	/*
+     * Using a converter is optional, but provides great type safety
+	 * see the examples directory in the repository for an example using zod
+	 */
+    .withConverter(burritoConverterAdmin); //
+  const tryreactfireCollectionRef = firestore.collection("tryreactfire");
+
+  const dehydrateData = await dehydrate(
+    [burritoDocRef],
+    [tryreactfireCollectionRef],
+  );
+  return {
+    props: dehydrateData,
+	/**
+	* Or pass other props alongside the dehydrated data
+	*/
+    // props: { ...dehydrateData, myOtherProp: "goesHere" }
+  };
+}
+
+export default function Home() {
+ const burritoDocRef = doc(
+    useFirestore(),
+    "tryreactfire",
+    "burrito",
+  ).withConverter(burritoConverter);
+  const collectionRef = collection(useFirestore(), "tryreactfire").withConverter(burritoConverter), // This converter is optional, but it provides better type safety
+
+  const burritoDoc = useHydratedFirestoreDocData(burritoDocRef);
+  const tryreactfireCollection = useHydratedFirestoreCollectionData(
+    collectionRef
+  );
+
+  if (
+    burritoDoc.status === "loading" ||
+    tryreactfireCollection.status === "loading"
+  ) {
+    /**
+     * We are prefetching the required data on the server, so this scenario
+     * should never happen on the client.
+     */
+    throw new Error("Should not happen!");
+  }
+
+  return (
+    <p>
+      There are {tryreactfireCollection.data.length} document(s) in the
+      collection! <br />
+      The burrito is {burritoDoc.data.yummy ? "good" : "bad"}!
+    </p>
+  );
+}
+```

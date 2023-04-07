@@ -1,14 +1,13 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import {
   CollectionReference,
   DocumentReference,
 } from "firebase-admin/firestore";
 import {
+  CollectionReference as CollectionReferenceClient,
   DocumentData,
   DocumentReference as DocumentReferenceClient,
-  CollectionReference as CollectionReferenceClient,
 } from "firebase/firestore";
-import { createContext, useContext } from "react";
 import { useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
 
 type HydrateContext = {
@@ -41,18 +40,17 @@ export async function dehydrateDocument(docRef: DocumentReference) {
 }
 
 export function useHydratedFirestoreDocData<T = unknown>(
-  docRef: DocumentReferenceClient<T>,
+  docRef: DocumentReferenceClient<T>
 ) {
   const hydrate = useHydrate();
-  const data = useFirestoreDocData(
+  return useFirestoreDocData(
     docRef,
     hydrate && Object.keys(hydrate).includes(docRef.path)
       ? {
           initialData: hydrate[docRef.path],
         }
-      : {},
+      : {}
   );
-  return data;
 }
 
 export async function dehydrateCollection(collectionRef: CollectionReference) {
@@ -63,32 +61,31 @@ export async function dehydrateCollection(collectionRef: CollectionReference) {
 }
 
 export function useHydratedFirestoreCollectionData<T = unknown>(
-  collectionRef: CollectionReferenceClient<T>,
+  collectionRef: CollectionReferenceClient<T>
 ) {
   const hydrate = useHydrate();
-  const data = useFirestoreCollectionData(
+  return useFirestoreCollectionData(
     collectionRef,
     hydrate && Object.keys(hydrate).includes(collectionRef.path)
       ? {
           initialData: hydrate[collectionRef.path],
         }
-      : {},
+      : {}
   );
-  return data;
 }
 
 export async function dehydrate(
   docs?: DocumentReference[],
-  collections?: CollectionReference[],
+  collections?: CollectionReference[]
 ): Promise<{
   dehydratedState: { [key: string]: DocumentData | undefined | DocumentData[] };
 }> {
   const docsPromises = docs?.map(
-    async (docRef) => await dehydrateDocument(docRef),
+    async (docRef) => await dehydrateDocument(docRef)
   );
   const dehydratedDocs = docsPromises && (await Promise.all(docsPromises));
   const collectionsPromises = collections?.map(
-    async (collectionRef) => await dehydrateCollection(collectionRef),
+    async (collectionRef) => await dehydrateCollection(collectionRef)
   );
   const dehydratedCollections =
     collectionsPromises && (await Promise.all(collectionsPromises));

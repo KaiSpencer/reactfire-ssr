@@ -1,11 +1,38 @@
-# Introduction
- 
-Welcome to Nextra! This is a basic docs template. You can use it as a starting point for your own project :)
+import { Callout, Tab, Tabs } from "nextra-theme-docs";
 
-## What is Nextra?
+# Reactfire SSR
 
-A **simple**, **powerful** and **flexible** site generation framework with everything you love from Next.js.
+Reactfire SSR builds on top of Reactfire to provide server-side rendering support for firebase when using reactfire.
 
-## Documentation
+## Installation
 
-The documentation is available at [https://nextra.site](https://nextra.site).
+Required dependencies:
+
+- reactfire-ssr (duh!)
+- reactfire
+- firebase
+- firebase-admin
+
+<Tabs items={["pnpm", "npm", "yarn"]}>
+  <Tab>
+  ```bash copy
+  pnpm install reactfire-ssr reactfire
+  ```
+  </Tab>
+  <Tab>
+  ```bash copy
+  npm install reactfire-ssr reactfire
+  ```
+  </Tab>
+  <Tab>
+  ```bash copy
+  yarn add reactfire-ssr reactfire
+  ```
+  </Tab>
+</Tabs>
+
+## Project Status
+
+This project is currently pre alpha and is __not__ ready for production use.
+
+APIs are subject to change, and are likely to change frequently.
