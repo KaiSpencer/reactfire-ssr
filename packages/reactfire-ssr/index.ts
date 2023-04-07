@@ -1,1 +1,6 @@
-export * from "./nextjs";
+export {
+  useHydratedFirestoreCollectionData,
+  dehydrate,
+  Hydrate,
+  useHydratedFirestoreDocData,
+} from "./nextjs";

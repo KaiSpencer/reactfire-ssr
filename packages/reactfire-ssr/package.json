@@ -9,17 +9,16 @@
     "lint": "tsc"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.26.0",
     "@types/react": "^18",
-    "tsup": "^6.5.0",
-    "typescript": "^5.0.3"
-  },
-  "dependencies": {
-    "firebase": "^9.19.1",
-    "firebase-admin": "^11.5.0",
-    "reactfire": "^4.2.2"
+    "react": ">=16.8.0",
+    "firebase": ">=9",
+    "firebase-admin": ">=11",
+    "reactfire": ">=4"
   },
   "peerDependencies": {
-    "react": ">=16.8.0"
+    "react": ">=16.8.0",
+    "firebase": ">=9",
+    "firebase-admin": ">=11",
+    "reactfire": ">=4"
   }
 }

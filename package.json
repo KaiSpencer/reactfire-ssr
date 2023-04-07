@@ -1,0 +1,12 @@
+{
+  "name": "reactfire-ssr-root",
+  "scripts": {
+    "build": "cd packages/reactfire-ssr && pnpm build",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.1",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4"
+  }
+}
