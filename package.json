@@ -1,6 +1,7 @@
 {
   "name": "reactfire-ssr-root",
   "scripts": {
+    "lint": "cd packages/reactfire-ssr && pnpm lint",
     "build": "cd packages/reactfire-ssr && pnpm build",
     "release": "pnpm build && changeset publish"
   },
