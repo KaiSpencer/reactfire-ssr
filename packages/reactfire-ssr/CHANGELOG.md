@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.3
+
+### Patch Changes
+
+- aa0adc2: Still working on an initial publish
+
 ## 0.0.2
 
 ### Patch Changes
