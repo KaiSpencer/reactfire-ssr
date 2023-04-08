@@ -1,5 +1,12 @@
 # reactfire-ssr
 
+## 0.0.4
+
+### Patch Changes
+
+- 3242d9c: Initial release still
+- c40da87: Tweak CI
+
 ## 0.0.3
 
 ### Patch Changes
