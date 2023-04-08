@@ -3,7 +3,14 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!*CHANGELOG.md",
+        "!*LICENSE",
+        "!*README.md",
+        "!*package.json"
+      ]
     },
     "lint": {},
     "dev": {
