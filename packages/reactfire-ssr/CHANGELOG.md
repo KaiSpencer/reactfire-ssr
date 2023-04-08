@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.5
+
+### Patch Changes
+
+- 7e8f0cd: Fix package main field
+
 ## 0.0.4
 
 ### Patch Changes
