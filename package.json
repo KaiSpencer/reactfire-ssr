@@ -1,0 +1,18 @@
+{
+  "name": "reactfire-ssr-root",
+  "scripts": {
+    "lint": "turbo run lint",
+    "lint:ssr": "turbo run lint --filter=reactfire-ssr...",
+    "build": "turbo run build",
+    "build:ssr": "turbo run build --filter=reactfire-ssr...",
+    "dev:docs": "turbo run dev --filter=docs",
+    "dev:example": "turbo run dev --filter=example-nextjs...",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.1",
+    "tsup": "^6.7.0",
+    "turbo": "^1.8.8",
+    "typescript": "^5.0.4"
+  }
+}

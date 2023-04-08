@@ -1,7 +1,8 @@
 {
-  "name": "nextra-docs-template",
+  "name": "docs",
+  "private": true,
   "version": "0.0.1",
-  "description": "Nextra docs template",
+  "description": "Documentation for reactfire-ssr",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shuding/nextra-docs-template.git"
+    "url": "git+https://github.com/KaiSpencer/reactfire-ssr.git"
   },
-  "author": "Shu Ding <g@shud.in>",
+  "author": "Kai Spencer <hello@kaispencer.co.uk>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/shuding/nextra-docs-template/issues"
+    "url": "https://github.com/KaiSpencer/reactfire-ssr/issues"
   },
-  "homepage": "https://github.com/shuding/nextra-docs-template#readme",
+  "homepage": "https://github.com/KaiSpencer/reactfire-ssr#readme",
   "dependencies": {
     "next": "13.3.1-canary.1",
     "nextra": "latest",

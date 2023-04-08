@@ -2,24 +2,29 @@
   "name": "reactfire-ssr",
   "license": "MIT",
   "version": "0.0.1",
-  "main": "index.tsx",
+  "main": "dist/index.ts",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup index.ts --format cjs,esm --dts",
+    "dev": "tsup index.ts --format cjs,esm --watch",
     "release": "pnpm run build && changeset publish",
     "lint": "tsc"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
-    "@changesets/cli": "^2.26.0",
     "@types/react": "^18",
-    "tsup": "^6.5.0",
-    "typescript": "^5.0.3"
-  },
-  "dependencies": {
-    "firebase": "^9.19.1",
-    "firebase-admin": "^11.5.0",
-    "reactfire": "^4.2.2"
+    "react": ">=16.8.0",
+    "firebase": ">=9",
+    "firebase-admin": ">=11",
+    "reactfire": ">=4"
   },
   "peerDependencies": {
-    "react": ">=16.8.0"
+    "react": ">=16.8.0",
+    "firebase": ">=9",
+    "firebase-admin": ">=11",
+    "reactfire": ">=4"
   }
 }

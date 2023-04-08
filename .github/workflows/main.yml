@@ -1,12 +1,16 @@
 name: CI
 on:
   push:
-    branches:
-      - "**"
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
@@ -17,5 +21,27 @@ jobs:
           node-version: 16.x
           cache: "pnpm"
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint && pnpm run build
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - run: pnpm install
+      - run: pnpm run lint
+      - run: pnpm run build
