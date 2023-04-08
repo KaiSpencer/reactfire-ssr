@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/reactfire-ssr.svg)](https://badge.fury.io/js/reactfire-ssr)
+
 # Reactfire SSR
 
 This library builds upon [Reactfire](https://github.com/FirebaseExtended/reactfire) to provide server-side rendering support for Firebase.
