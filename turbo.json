@@ -3,8 +3,8 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"],
-      "inputs": ["**/*.{js,jsx,ts,tsx,mdx}"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "inputs": ["!**/CHANGELOG.md"]
     },
     "lint": {},
     "dev": {
