@@ -2,12 +2,18 @@
   "name": "reactfire-ssr",
   "license": "MIT",
   "version": "0.0.1",
-  "main": "index.tsx",
+  "main": "dist/index.ts",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup index.ts --format cjs,esm --dts",
+    "dev": "tsup index.ts --format cjs,esm --watch",
     "release": "pnpm run build && changeset publish",
     "lint": "tsc"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/react": "^18",
     "react": ">=16.8.0",
