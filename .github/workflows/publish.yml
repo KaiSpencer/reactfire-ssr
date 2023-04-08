@@ -20,9 +20,7 @@ jobs:
         with:
           version: 7
       - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: "pnpm"
+
 
       # Cached pnpm install
       - uses: pnpm/action-setup@v2
