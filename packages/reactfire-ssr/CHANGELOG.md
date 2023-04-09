@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.7
+
+### Patch Changes
+
+- 8d1639a: Allow reference or query
+
 ## 0.0.6
 
 ### Patch Changes
