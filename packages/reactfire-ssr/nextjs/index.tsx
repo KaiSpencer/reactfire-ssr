@@ -98,11 +98,11 @@ function useHydratedFirestoreCollectionData<T extends string[]>(
 
 type DehydrateDocItem<TQueryKeys extends string[]> = PartialRecord<
   TQueryKeys[number],
-  DocumentReferenceAdmin
+  DocumentReferenceAdmin | QueryAdmin
 >;
 type DehydrateCollectionItem<TQueryKeys extends string[]> = PartialRecord<
   TQueryKeys[number],
-  QueryAdmin
+  CollectionReferenceAdmin | QueryAdmin
 >;
 
 type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
