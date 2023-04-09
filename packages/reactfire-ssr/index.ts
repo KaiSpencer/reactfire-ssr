@@ -1,6 +1,1 @@
-export {
-  useHydratedFirestoreCollectionData,
-  dehydrate,
-  Hydrate,
-  useHydratedFirestoreDocData,
-} from "./nextjs";
+export { Hydrate, initializeReactfireSSR } from "./nextjs";

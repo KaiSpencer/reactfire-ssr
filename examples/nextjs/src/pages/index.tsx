@@ -1,26 +1,41 @@
 import { firestoreAdmin } from "@/firebase-admin";
 import { burritoConverter, burritoConverterAdmin } from "@/firestore/converter";
-import {
-  CollectionReference,
-  collection,
-  doc,
-  query,
-} from "firebase/firestore";
+import { collection, doc, query, where } from "firebase/firestore";
 import { useFirestore } from "reactfire";
-import {
-  dehydrate,
-  useHydratedFirestoreCollectionData,
-  useHydratedFirestoreDocData,
-} from "reactfire-ssr/nextjs";
+import { initializeReactfireSSR } from "reactfire-ssr/nextjs";
+
+const reactfireSSR =
+  initializeReactfireSSR<
+    [
+      "burritoDocument",
+      "burritoDocument2",
+      "tryreactfireCollection",
+      "tryreactfireCollectionYummy"
+    ]
+  >();
 
 export async function getServerSideProps() {
   const burritoDocRef = firestoreAdmin
     .doc("tryreactfire/burrito")
     .withConverter(burritoConverterAdmin); // This converter is optional, but it provides better type safety
-  const tryreactfireCollectionRef = firestoreAdmin.collection("tryreactfire");
-  const dehydrateData = await dehydrate(
-    [burritoDocRef],
-    [tryreactfireCollectionRef]
+  const tryreactfireCollectionRef = firestoreAdmin
+    .collection("tryreactfire")
+    .withConverter(burritoConverterAdmin);
+
+  const tryreactfireCollectionRefYummy = tryreactfireCollectionRef.where(
+    "yummy",
+    "==",
+    true
+  );
+  const dehydrateData = await reactfireSSR.dehydrate(
+    {
+      burritoDocument: burritoDocRef,
+      burritoDocument2: burritoDocRef,
+    },
+    {
+      tryreactfireCollection: tryreactfireCollectionRef,
+      tryreactfireCollectionYummy: tryreactfireCollectionRefYummy,
+    }
   );
   return {
     props: dehydrateData,
@@ -39,13 +54,25 @@ export default function Home() {
     "tryreactfire"
   ).withConverter(burritoConverter); // This converter is optional, but it provides better type safety
 
-  const burritoDoc = useHydratedFirestoreDocData(burritoDocRef);
+  const burritoDoc = reactfireSSR.useHydratedFirestoreDocData(
+    burritoDocRef,
+    "burritoDocument"
+  );
   const tryreactfireCollection =
-    useHydratedFirestoreCollectionData(collectionRef);
+    reactfireSSR.useHydratedFirestoreCollectionData(
+      collectionRef,
+      "tryreactfireCollection"
+    );
+
+  const tryreactfireCollectionYummy =
+    reactfireSSR.useHydratedFirestoreCollectionData(
+      query(collectionRef, where("yummy", "==", true)),
+      "tryreactfireCollectionYummy"
+    );
 
   if (
     burritoDoc.status === "loading" ||
-    tryreactfireCollection.status === "loading"
+    tryreactfireCollectionYummy.status === "loading"
   ) {
     /**
      * We are prefetching the required data on the server, so this scenario
@@ -56,7 +83,10 @@ export default function Home() {
 
   return (
     <p>
-      There are {tryreactfireCollection.data.length} document(s) in the
+      There are {tryreactfireCollection.data.length} documents in the
+      collection!
+      <br />
+      There are {tryreactfireCollectionYummy.data.length} yummy documents in the
       collection! <br />
       The burrito is {burritoDoc.data.yummy ? "good" : "bad"}!
     </p>

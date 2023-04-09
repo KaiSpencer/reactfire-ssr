@@ -1,4 +1,6 @@
-# Firestore Quick Start
+import {
+  Callout
+} from "nextra-theme-docs";
 
 The following quick start example builds upon the `burrito` example in the [reactfire quick start guide](https://github.com/FirebaseExtended/reactfire/blob/main/docs/quickstart.md).
 
@@ -59,31 +61,76 @@ Now we need to use `getServerSideProps` to pre-fetch the data from firestore.
 
 Because `getServerSideProps` runs on the server we need to use the `firebase-admin` sdk to access firestore __not__ `firebase`.
 
-Use the `dehydrate` function which is a helper to unwrap a list of `DocumentReference` and `CollectionReference` objects,
+First initialize `initReactfireSSR` which is the base object which all exposed methods you need are attached to (this also helps with type hinting).
+
+This function accepts a generic type which you should populate with unique identifiers for each `DocumentReference` and `CollectionReference` you will be using.
+
+We aim to remove the need for this in the future, but for now until we can figure out a better way to do this, this is the best solution.
+
+The unique identifiers can be anything you want, you will pass them to the hooks when you access the data on the client.
+
+<Callout type="warning">
+  Only call `initializeReactfireSSR` once in your application. Its a good idea to do this in a separate file and import it where you need it.
+</Callout>
+
+
+```tsx showLineNumbers filename="pages/index.tsx"
+import {initializeReactfireSSR} from "reactfire-ssr";
+
+const reactfireSSR =
+  initializeReactfireSSR<
+    [
+      "burritoDocument",
+      "tryreactfireCollection",
+      "tryreactfireCollectionYummy"
+    ]
+  >();
+```
+
+Use the `dehydrate` method function which is a helper to unwrap a list of `DocumentReference` and `CollectionReference` objects,
 pass this as props to the page to make it available to `reactfire-ssr` hooks in your components.
 
-```tsx showLineNumbers filename="pages/index.tsx" {19-22}
+You will notice the keys in the objects passed to `dehydrate` match the unique identifiers you passed to `initializeReactfireSSR`.
+
+```tsx showLineNumbers filename="pages/index.tsx"
 import {getFirestore} from "firebase-admin";
-import {dehydrate} from "reactfire-ssr";
+import {initializeReactfireSSR} from "reactfire-ssr";
 /**
 * Ensure you have initialized firebase somewhere,
 * see the examples directory in the repository for an example
 */
 const firestore = getFirestore()
+const reactfireSSR =
+  initializeReactfireSSR<
+    [
+      "burritoDocument",
+      "tryreactfireCollection",
+      "tryreactfireCollectionYummy"
+    ]
+  >();
 
 export async function getServerSideProps() {
   const burritoDocRef = firestore
     .doc("tryreactfire/burrito")
-	/*
-     * Using a converter is optional, but provides great type safety
-	 * see the examples directory in the repository for an example using zod
-	 */
-    .withConverter(burritoConverterAdmin); //
-  const tryreactfireCollectionRef = firestore.collection("tryreactfire");
+    .withConverter(burritoConverterAdmin); // This converter is optional, but it provides better type safety if you provide one
+  const tryreactfireCollectionRef = firestore
+    .collection("tryreactfire")
+    .withConverter(burritoConverterAdmin);
 
-  const dehydrateData = await dehydrate(
-    [burritoDocRef],
-    [tryreactfireCollectionRef],
+  const tryreactfireCollectionRefYummy = tryreactfireCollectionRef.where(
+    "yummy",
+    "==",
+    true
+  );
+  const dehydrateData = await reactfireSSR.dehydrate(
+    {
+      burritoDocument: burritoDocRef,
+      burritoDocument2: burritoDocRef,
+    },
+    {
+      tryreactfireCollection: tryreactfireCollectionRef,
+      tryreactfireCollectionYummy: tryreactfireCollectionRefYummy,
+    }
   );
   return {
     props: dehydrateData,
@@ -99,38 +146,19 @@ export async function getServerSideProps() {
 
 Now we can use the `useHydratedFirestoreDocData` and `useHydratedFirestoreCollectionData` hooks to access the pre-fetched data.
 
-There is nothing fancy to know about these hooks, they simply wrap `useFirestoreDocData` and `useFirestoreCollectionData` respectively.
+The first argument is the same as the `useFirestoreDocData` and `useFirestoreCollectionData` hooks which these wrap, the second argument is the unique identifier you passed to `initializeReactfireSSR`.
 
-Under the hood these hooks will use the `dehydrated` data if it is available, otherwise it will fetch the data from firestore.
+Under the hood these hooks will use the `dehydrated` data if it is available against the unique identifier you passed to the hook.
 
-If its available, your data will be available instantly on the client without a loading state.
+If it's available, your data will be available instantly on the client without a loading state.
 
-```tsx showLineNumbers filename="pages/index.tsx" {28-59}
-import {useHydratedFirestoreDocData, useHydratedFirestoreCollectionData} from "reactfire-ssr";
+```tsx showLineNumbers filename="pages/index.tsx"
+import {reactfireSSR} from "reactfire-ssr";
 
 const firestore = getFirestore()
 
 export async function getServerSideProps() {
-  const burritoDocRef = firestore
-    .doc("tryreactfire/burrito")
-	/*
-     * Using a converter is optional, but provides great type safety
-	 * see the examples directory in the repository for an example using zod
-	 */
-    .withConverter(burritoConverterAdmin); //
-  const tryreactfireCollectionRef = firestore.collection("tryreactfire");
-
-  const dehydrateData = await dehydrate(
-    [burritoDocRef],
-    [tryreactfireCollectionRef],
-  );
-  return {
-    props: dehydrateData,
-	/**
-	* Or pass other props alongside the dehydrated data
-	*/
-    // props: { ...dehydrateData, myOtherProp: "goesHere" }
-  };
+  ...
 }
 
 export default function Home() {
@@ -141,9 +169,9 @@ export default function Home() {
   ).withConverter(burritoConverter);
   const collectionRef = collection(useFirestore(), "tryreactfire").withConverter(burritoConverter), // This converter is optional, but it provides better type safety
 
-  const burritoDoc = useHydratedFirestoreDocData(burritoDocRef);
-  const tryreactfireCollection = useHydratedFirestoreCollectionData(
-    collectionRef
+  const burritoDoc = reactfireSSR.useHydratedFirestoreDocData(burritoDocRef, "burritoDocument");
+  const tryreactfireCollection = reactfireSSR.useHydratedFirestoreCollectionData(
+    collectionRef, "tryreactfireCollection"
   );
 
   if (
@@ -166,3 +194,9 @@ export default function Home() {
   );
 }
 ```
+
+# Stuck?
+
+If you get stuck there is a [working example in the repository](https://github.com/KaiSpencer/reactfire-ssr/blob/main/examples/nextjs/src/pages/index.tsx).
+
+If you are still stuck, please [open an issue](https://github.com/KaiSpencer/reactfire-ssr/issues/new)
