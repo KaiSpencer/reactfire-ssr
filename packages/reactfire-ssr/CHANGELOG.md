@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.6
+
+### Patch Changes
+
+- c13d428: Root initializer function to scope all exports. Improved type safety
+
 ## 0.0.5
 
 ### Patch Changes
