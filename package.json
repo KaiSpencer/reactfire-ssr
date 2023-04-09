@@ -8,7 +8,8 @@
     "build:packages": "turbo run build --filter=\"./packages/*\"",
     "dev:docs": "turbo run dev --filter=docs",
     "dev:example": "turbo run dev --filter=example-nextjs...",
-    "release": "pnpm build:packages && changeset publish"
+    "release": "pnpm build:packages && changeset publish",
+    "changeset": "changeset"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.1",
