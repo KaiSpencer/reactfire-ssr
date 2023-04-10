@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.8
+
+### Patch Changes
+
+- 140a0df: Remove redundant query type
+
 ## 0.0.7
 
 ### Patch Changes
