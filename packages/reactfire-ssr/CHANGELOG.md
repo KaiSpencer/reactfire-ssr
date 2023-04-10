@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.9
+
+### Patch Changes
+
+- 1eff179: Fixing mjs
+
 ## 0.0.8
 
 ### Patch Changes
