@@ -7,7 +7,7 @@ import {
 import {
   DocumentData,
   DocumentReference as DocumentReferenceClient,
-  Query,
+  Query as QueryClient,
 } from "firebase/firestore";
 import { useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
 
@@ -73,7 +73,7 @@ async function dehydrateCollection<const TQueryKeys extends string[]>(
 ) {
   const [key, value] = Object.entries(dehydrateItem)[0] as [
     TQueryKeys[number],
-    CollectionReferenceAdmin
+    QueryAdmin
   ];
   const collectionSnap = await value.get();
   return {
@@ -82,7 +82,7 @@ async function dehydrateCollection<const TQueryKeys extends string[]>(
 }
 
 function useHydratedFirestoreCollectionData<T extends string[]>(
-  collectionRef: Query,
+  collectionRef: QueryClient,
   queryKey: T[number]
 ) {
   const hydrate = useHydrate<T>();
