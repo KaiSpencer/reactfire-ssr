@@ -19,7 +19,7 @@ export type Order = z.infer<typeof BurritoDocSchema>;
 
 export const burritoConverter: FirestoreDataConverter<Order> = {
   toFirestore: (order: Order) => order,
-  fromFirestore: (snapshot: QueryDocumentSnapshot<DocumentData>) => {
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     return BurritoDocSchema.parse(snapshot.data());
   },
 };

@@ -6,7 +6,7 @@ import {
   FirestoreProvider,
   useFirebaseApp,
 } from "reactfire";
-import { Hydrate } from "reactfire-ssr/nextjs";
+import { Hydrate } from "reactfire-ssr";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAc8gvOiWAiYhqx0-TxAGWjIDVISJn822E",

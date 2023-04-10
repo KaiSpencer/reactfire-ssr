@@ -2,7 +2,7 @@ import { firestoreAdmin } from "@/firebase-admin";
 import { burritoConverter, burritoConverterAdmin } from "@/firestore/converter";
 import { collection, doc, query, where } from "firebase/firestore";
 import { useFirestore } from "reactfire";
-import { initializeReactfireSSR } from "reactfire-ssr/nextjs";
+import { initializeReactfireSSR } from "reactfire-ssr";
 
 const reactfireSSR =
   initializeReactfireSSR<
@@ -49,10 +49,7 @@ export default function Home() {
     "tryreactfire",
     "burrito"
   ).withConverter(burritoConverter);
-  const collectionRef = collection(
-    useFirestore(),
-    "tryreactfire"
-  ).withConverter(burritoConverter); // This converter is optional, but it provides better type safety
+  const collectionRef = collection(useFirestore(), "tryreactfire"); //.withConverter(burritoConverter); // This converter is optional, but it provides better type safety
 
   const burritoDoc = reactfireSSR.useHydratedFirestoreDocData(
     burritoDocRef,
