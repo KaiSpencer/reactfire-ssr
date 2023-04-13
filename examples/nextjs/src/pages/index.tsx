@@ -10,7 +10,7 @@ const reactfireSSR =
       "burritoDocument",
       "burritoDocument2",
       "tryreactfireCollection",
-      "tryreactfireCollectionYummy"
+      "tryreactfireCollectionYummy",
     ]
   >();
 
@@ -25,7 +25,7 @@ export async function getServerSideProps() {
   const tryreactfireCollectionRefYummy = tryreactfireCollectionRef.where(
     "yummy",
     "==",
-    true
+    true,
   );
   const dehydrateData = await reactfireSSR.dehydrate(
     {
@@ -35,7 +35,7 @@ export async function getServerSideProps() {
     {
       tryreactfireCollection: tryreactfireCollectionRef,
       tryreactfireCollectionYummy: tryreactfireCollectionRefYummy,
-    }
+    },
   );
   return {
     props: dehydrateData,
@@ -47,24 +47,27 @@ export default function Home() {
   const burritoDocRef = doc(
     useFirestore(),
     "tryreactfire",
-    "burrito"
+    "burrito",
   ).withConverter(burritoConverter);
-  const collectionRef = collection(useFirestore(), "tryreactfire"); //.withConverter(burritoConverter); // This converter is optional, but it provides better type safety
+  const collectionRef = collection(
+    useFirestore(),
+    "tryreactfire",
+  ).withConverter(burritoConverter); // This converter is optional, but it provides better type safety
 
   const burritoDoc = reactfireSSR.useHydratedFirestoreDocData(
     burritoDocRef,
-    "burritoDocument"
+    "burritoDocument",
   );
   const tryreactfireCollection =
     reactfireSSR.useHydratedFirestoreCollectionData(
       collectionRef,
-      "tryreactfireCollection"
+      "tryreactfireCollection",
     );
 
   const tryreactfireCollectionYummy =
     reactfireSSR.useHydratedFirestoreCollectionData(
       query(collectionRef, where("yummy", "==", true)),
-      "tryreactfireCollectionYummy"
+      "tryreactfireCollectionYummy",
     );
 
   if (
