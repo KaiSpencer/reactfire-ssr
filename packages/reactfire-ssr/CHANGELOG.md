@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.10
+
+### Patch Changes
+
+- 4c6c59b: Infer reference types
+
 ## 0.0.9
 
 ### Patch Changes
