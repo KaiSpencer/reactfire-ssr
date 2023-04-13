@@ -18,9 +18,23 @@ const HydrateContext = createContext<HydrateContext<any>>(undefined as any);
 export function initializeReactfireSSR<const TQueryKeys extends string[]>() {
   return {
     dehydrate: dehydrate<TQueryKeys>,
-    useHydratedFirestoreDocData: useHydratedFirestoreDocData<TQueryKeys>,
-    useHydratedFirestoreCollectionData:
-      useHydratedFirestoreCollectionData<TQueryKeys>,
+    useHydratedFirestoreDocData: function <TDocType extends DocumentData>(
+      docRef: DocumentReferenceClient<TDocType>,
+      queryKey: TQueryKeys[number],
+    ) {
+      return useHydratedFirestoreDocData<TQueryKeys, TDocType>(
+        docRef,
+        queryKey,
+      );
+    },
+    useHydratedFirestoreCollectionData: function <
+      TDocType extends DocumentData,
+    >(collectionRef: QueryClient<TDocType>, queryKey: TQueryKeys[number]) {
+      return useHydratedFirestoreCollectionData<TQueryKeys, TDocType>(
+        collectionRef,
+        queryKey,
+      );
+    },
   };
 }
 
@@ -41,11 +55,11 @@ export function Hydrate<const TQueryKeys extends string[]>({
 }
 
 async function dehydrateDocument<const TQueryKeys extends string[]>(
-  dehydrateItem: DehydrateDocItem<TQueryKeys>
+  dehydrateItem: DehydrateDocItem<TQueryKeys>,
 ) {
   const [key, value] = Object.entries(dehydrateItem)[0] as [
     TQueryKeys[number],
-    DocumentReferenceAdmin
+    DocumentReferenceAdmin,
   ];
   const docSnap = await value.get();
   return {
@@ -53,27 +67,27 @@ async function dehydrateDocument<const TQueryKeys extends string[]>(
   };
 }
 
-function useHydratedFirestoreDocData<const T extends string[]>(
-  docRef: DocumentReferenceClient,
-  queryKey: T[number]
-) {
+function useHydratedFirestoreDocData<
+  const T extends string[],
+  TDocType extends DocumentData = DocumentData,
+>(docRef: DocumentReferenceClient<TDocType>, queryKey: T[number]) {
   const hydrate = useHydrate<T>();
-  return useFirestoreDocData(
+  return useFirestoreDocData<TDocType>(
     docRef,
     hydrate && queryKey in hydrate
       ? {
           initialData: hydrate[queryKey],
         }
-      : {}
+      : {},
   );
 }
 
 async function dehydrateCollection<const TQueryKeys extends string[]>(
-  dehydrateItem: DehydrateCollectionItem<TQueryKeys>
+  dehydrateItem: DehydrateCollectionItem<TQueryKeys>,
 ) {
   const [key, value] = Object.entries(dehydrateItem)[0] as [
     TQueryKeys[number],
-    QueryAdmin
+    QueryAdmin,
   ];
   const collectionSnap = await value.get();
   return {
@@ -81,10 +95,10 @@ async function dehydrateCollection<const TQueryKeys extends string[]>(
   };
 }
 
-function useHydratedFirestoreCollectionData<T extends string[]>(
-  collectionRef: QueryClient,
-  queryKey: T[number]
-) {
+function useHydratedFirestoreCollectionData<
+  T extends string[],
+  TDocType extends DocumentData,
+>(collectionRef: QueryClient<TDocType>, queryKey: T[number]) {
   const hydrate = useHydrate<T>();
   return useFirestoreCollectionData(
     collectionRef,
@@ -92,7 +106,7 @@ function useHydratedFirestoreCollectionData<T extends string[]>(
       ? {
           initialData: hydrate[queryKey],
         }
-      : {}
+      : {},
   );
 }
 
@@ -109,12 +123,12 @@ type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 
 async function dehydrate<const TQueryKeys extends string[]>(
   docs?: DehydrateDocItem<TQueryKeys>,
-  collections?: DehydrateCollectionItem<TQueryKeys>
+  collections?: DehydrateCollectionItem<TQueryKeys>,
 ) {
   const docsPromises =
     docs &&
     Object.entries(docs).map(([key, value]) =>
-      dehydrateDocument({ [key]: value } as DehydrateDocItem<TQueryKeys>)
+      dehydrateDocument({ [key]: value } as DehydrateDocItem<TQueryKeys>),
     );
   const dehydratedDocs = await Promise.all(docsPromises || []);
   const collectionsPromises =
@@ -122,7 +136,7 @@ async function dehydrate<const TQueryKeys extends string[]>(
     Object.entries(collections).map(([key, value]) =>
       dehydrateCollection({
         [key]: value,
-      } as DehydrateCollectionItem<TQueryKeys>)
+      } as DehydrateCollectionItem<TQueryKeys>),
     );
   const dehydratedCollections = await Promise.all(collectionsPromises || []);
   return {
