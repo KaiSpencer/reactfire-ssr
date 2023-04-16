@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.11
+
+### Patch Changes
+
+- 8f7c18c: Stringify data across the wire
+
 ## 0.0.10
 
 ### Patch Changes
