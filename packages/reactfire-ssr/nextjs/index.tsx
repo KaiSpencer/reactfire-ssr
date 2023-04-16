@@ -114,7 +114,7 @@ function useHydratedFirestoreCollectionData<
     collectionRef,
     hydrate && queryKey in hydrate
       ? {
-          initialData: hydrate[queryKey],
+          initialData: JSON.parse(hydrate[queryKey]),
         }
       : {},
   );
