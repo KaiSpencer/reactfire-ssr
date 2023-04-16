@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.13
+
+### Patch Changes
+
+- e8c7a21: Deal with collection json properly
+
 ## 0.0.12
 
 ### Patch Changes
