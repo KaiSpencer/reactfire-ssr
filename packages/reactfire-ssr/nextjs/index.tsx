@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
 
-type HydrateContext<T extends string[]> = Record<T[number], string>;
+type HydrateContext<T extends string[]> = Record<T[number], string | string[]>;
 
 const HydrateContext = createContext<HydrateContext<any>>(undefined as any);
 
@@ -76,11 +76,16 @@ function useHydratedFirestoreDocData<
   TDocType extends DocumentData = DocumentData,
 >(docRef: DocumentReferenceClient<TDocType>, queryKey: T[number]) {
   const hydrate = useHydrate<T>();
+  if (Array.isArray(hydrate[queryKey])) {
+    throw new Error(
+      "You are trying to hydrate a document with an array of documents. Did you mean to hydrate a collection?",
+    );
+  }
   return useFirestoreDocData<TDocType>(
     docRef,
     hydrate && queryKey in hydrate
       ? {
-          initialData: JSON.parse(hydrate[queryKey]),
+          initialData: JSON.parse(hydrate[queryKey] as string),
         }
       : {},
   );
@@ -110,11 +115,18 @@ function useHydratedFirestoreCollectionData<
   TDocType extends DocumentData,
 >(collectionRef: QueryClient<TDocType>, queryKey: T[number]) {
   const hydrate = useHydrate<T>();
+  if (typeof hydrate[queryKey] === "string") {
+    throw new Error(
+      "You are trying to hydrate a collection with a single document. Did you mean to hydrate a document?",
+    );
+  }
   return useFirestoreCollectionData(
     collectionRef,
     hydrate && queryKey in hydrate
       ? {
-          initialData: hydrate[queryKey],
+          initialData: (hydrate[queryKey] as string[]).map((docData) =>
+            JSON.parse(docData),
+          ),
         }
       : {},
   );
