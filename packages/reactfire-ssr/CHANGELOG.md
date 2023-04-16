@@ -1,5 +1,11 @@
 # reactfire-ssr
 
+## 0.0.12
+
+### Patch Changes
+
+- 949fa87: Parse collection data
+
 ## 0.0.11
 
 ### Patch Changes
