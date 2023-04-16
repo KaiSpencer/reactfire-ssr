@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { useFirestoreCollectionData, useFirestoreDocData } from "reactfire";
 
-type HydrateContext<T extends string[]> = Record<T[number], DocumentData>;
+type HydrateContext<T extends string[]> = Record<T[number], string>;
 
 const HydrateContext = createContext<HydrateContext<any>>(undefined as any);
 
@@ -48,9 +48,13 @@ async function dehydrateDocument<const TQueryKeys extends string[]>(
     DocumentReferenceAdmin
   ];
   const docSnap = await value.get();
-  return {
-    [key]: docSnap.data(),
-  };
+  try {
+    return {
+      [key]: JSON.stringify(docSnap.data()),
+    };
+  } catch (error) {
+    throw new Error("Your document data must be JSON serializable");
+  }
 }
 
 function useHydratedFirestoreDocData<const T extends string[]>(
@@ -62,7 +66,7 @@ function useHydratedFirestoreDocData<const T extends string[]>(
     docRef,
     hydrate && queryKey in hydrate
       ? {
-          initialData: hydrate[queryKey],
+          initialData: JSON.parse(hydrate[queryKey]),
         }
       : {}
   );
@@ -76,9 +80,15 @@ async function dehydrateCollection<const TQueryKeys extends string[]>(
     QueryAdmin
   ];
   const collectionSnap = await value.get();
-  return {
-    [key]: collectionSnap.docs.map((docSnap) => docSnap.data()),
-  };
+  try {
+    return {
+      [key]: collectionSnap.docs.map((docSnap) =>
+        JSON.stringify(docSnap.data()),
+      ),
+    };
+  } catch (error) {
+    throw new Error("Your document data must be JSON serializable");
+  }
 }
 
 function useHydratedFirestoreCollectionData<T extends string[]>(
